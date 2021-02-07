@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    <filter>
+        <filter-name>GuestFilter</filter-name>
+        <filter-class>filter.GuestFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>GuestFilter</filter-name>
+        <url-pattern>/booking</url-pattern>
+        <url-pattern>/rooms/confirmation</url-pattern>
+        <url-pattern>/applications</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>AdminFilter</filter-name>
+        <filter-class>filter.AdminFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>AdminFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/view/error/error_404.jsp</location>
+    </error-page>
+</web-app>
