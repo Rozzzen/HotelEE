@@ -34,7 +34,7 @@ public class BookingServlet extends HttpServlet {
             LOG.debug("User[" + user.getName() + "] created booking[" + roomtypeID + ":" + capacity + "]");
             request.getSession().setAttribute("success", "Booking application created");
         } catch (SQLException e) {
-            LOG.error("Booking exception");
+            LOG.error("Booking exception", e);
             request.getSession().setAttribute("alert", "Unexpected error occured");
         }
         finally {
@@ -52,7 +52,7 @@ public class BookingServlet extends HttpServlet {
             roomTypeList = roomDaoImpl.getRoomTypeList((String) request.getSession().getAttribute("language"));
 
         } catch (SQLException e) {
-            LOG.error("Capacities/roomtypes get list exception");
+            LOG.error("Capacities/roomtypes get list exception", e);
         }
 
         request.setAttribute("capacities", list);

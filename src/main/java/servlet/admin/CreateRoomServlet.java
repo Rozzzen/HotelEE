@@ -31,7 +31,7 @@ public class CreateRoomServlet extends HttpServlet {
             roomDaoImpl.createRoom(roomNum, subtypeId, windowViewId);
             LOG.debug("Created room: [" + roomNum + "]");
         } catch (SQLException throwables) {
-            LOG.error("Room creation exception");
+            LOG.error("Room creation exception", throwables);
         }
         finally {
             response.sendRedirect("/admin/edit/rooms");
@@ -47,7 +47,7 @@ public class CreateRoomServlet extends HttpServlet {
             roomTypeList = roomDaoImpl.getSubTypeNames((String) request.getSession().getAttribute("language"));
             windowViewList = roomDaoImpl.getWindowViewNames((String) request.getSession().getAttribute("language"));
         } catch (SQLException throwables) {
-            LOG.error("Room/View list get exception");
+            LOG.error("Room/View list get exception", throwables);
         }
 
         request.setAttribute("subtypes", roomTypeList);

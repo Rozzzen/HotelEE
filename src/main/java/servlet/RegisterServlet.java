@@ -61,12 +61,12 @@ public class RegisterServlet extends HttpServlet {
             request.getSession().setAttribute("success", "Successfully registered");
             response.sendRedirect("/login");
         } catch (DateTimeParseException e) {
-            LOG.debug("User entered wrong birth day");
+            LOG.debug("User entered wrong birth day", e);
             request.getSession().setAttribute("alert", "Date validation failure");
             response.sendRedirect("register");
         } catch (SQLException ex) {
             if(ex instanceof SQLIntegrityConstraintViolationException) {
-                LOG.debug("User entered alredy existing email");
+                LOG.debug("User entered alredy existing email", ex);
                 request.getSession().setAttribute("alert", "User with this email already exists");
                 response.sendRedirect("register");
             }
@@ -77,17 +77,13 @@ public class RegisterServlet extends HttpServlet {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<String> months = Arrays.asList("January", "February", "March", "April", "May", "June", "July", "August", "September",
-                "October", "November", "December");
-        request.setAttribute("months", months);
-
         List<Gender> genderList = Collections.emptyList();
 
         try {
             genderList = userDaoImpl.getGenderList();
 
         } catch (SQLException e) {
-            LOG.error("Gender list get exception");
+            LOG.error("Gender list get exception", e);
         }
 
         request.setAttribute("genders", genderList);

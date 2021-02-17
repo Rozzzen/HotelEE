@@ -41,7 +41,7 @@ public class EditRoomServlet extends HttpServlet {
             } catch (SQLException e) {
                 if(e instanceof SQLIntegrityConstraintViolationException) {
                     request.getSession().setAttribute("alert", "Cannot remove booked room");
-                    LOG.error("Warned admin about booked rooms");
+                    LOG.error("Warned admin about booked rooms", e);
                 }
                 else LOG.error("Room edit exception");
             }
@@ -64,7 +64,7 @@ public class EditRoomServlet extends HttpServlet {
                 roomTypeList = roomDaoImpl.getSubTypeNames((String) request.getSession().getAttribute("language"));
                 windowViewList = roomDaoImpl.getWindowViewNames((String) request.getSession().getAttribute("language"));
             } catch (SQLException throwables) {
-                LOG.error("Room/View list get exception");
+                LOG.error("Room/View list get exception", throwables);
             }
 
             request.setAttribute("subtypes", roomTypeList);
@@ -73,7 +73,7 @@ public class EditRoomServlet extends HttpServlet {
             LOG.debug("Enter room edit page");
             request.getRequestDispatcher("/WEB-INF/view/admin/edit_rooms.jsp").forward(request, response);
         } catch (SQLException ex) {
-            LOG.error("Failed to get room list exception");
+            LOG.error("Failed to get room list exception", ex);
         }
     }
 }

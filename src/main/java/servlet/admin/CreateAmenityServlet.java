@@ -26,7 +26,7 @@ public class CreateAmenityServlet extends HttpServlet {
             roomDaoImpl.createAmenity(nameEN, nameRU, nameUA);
             LOG.debug("Created amenity: [" + nameEN + "]");
         } catch (SQLException throwables) {
-            LOG.error("Amenity creation exception");
+            LOG.error("Amenity creation exception", throwables);
         }
         finally {
             response.sendRedirect("/admin/edit/amenities");

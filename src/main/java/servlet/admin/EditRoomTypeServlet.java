@@ -52,7 +52,7 @@ public class EditRoomTypeServlet extends HttpServlet {
             } catch (SQLException ex) {
                 if(ex instanceof SQLIntegrityConstraintViolationException) {
                     request.getSession().setAttribute("alert", "Before removing this roomtype you have to change roomtypes of all rooms with this roomtype");
-                    LOG.error("Warned admin about roomtype and room");
+                    LOG.error("Warned admin about roomtype and room", ex);
                 }
                 else LOG.error("Roomtype edit page exception");
             } finally {
@@ -74,7 +74,7 @@ public class EditRoomTypeServlet extends HttpServlet {
                 amenityList = roomDaoImpl.getAllAmenities((String) request.getSession().getAttribute("language"));
                 roomTypeList = roomDaoImpl.getRoomTypeList((String) request.getSession().getAttribute("language"));
             } catch (SQLException throwables) {
-                LOG.error("Amenity/roomtype list get exception");
+                LOG.error("Amenity/roomtype list get exception", throwables);
             }
 
             request.setAttribute("roomtypes", roomTypeList);
@@ -83,7 +83,7 @@ public class EditRoomTypeServlet extends HttpServlet {
             LOG.debug("Enter roomtype edit page");
             request.getRequestDispatcher("/WEB-INF/view/admin/edit_roomtypes.jsp").forward(request, response);
         } catch (SQLException ex) {
-            LOG.error("Failed to get room lost exception");
+            LOG.error("Failed to get room lost exception", ex);
         }
     }
 }

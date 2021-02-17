@@ -29,7 +29,7 @@ public class RoomsServlet extends HttpServlet {
             LOG.debug("Enter rooms page");
             request.getRequestDispatcher("/WEB-INF/view/rooms.jsp").forward(request, response);
         } catch (SQLException e) {
-            LOG.error("Failed to get room list exception");
+            LOG.error("Failed to get room list exception", e);
         }
     }
 }

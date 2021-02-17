@@ -41,7 +41,7 @@ public class CreateRoomTypeServlet extends HttpServlet {
             roomDaoImpl.createSubType(price, capacity, image, roomtype, nameEN, nameRU, nameUA, amenityList);
             LOG.debug("Created roomtype: [" + nameEN + "]");
         } catch (SQLException throwables) {
-            LOG.error("Roomtype creation exception");
+            LOG.error("Roomtype creation exception", throwables);
             throwables.printStackTrace();
         }
         finally {
@@ -57,7 +57,7 @@ public class CreateRoomTypeServlet extends HttpServlet {
             amenityList = roomDaoImpl.getAllAmenities((String) request.getSession().getAttribute("language"));
             roomTypeList = roomDaoImpl.getRoomTypeList((String) request.getSession().getAttribute("language"));
         } catch (SQLException throwables) {
-            LOG.error("Amenity/roomtype list get exception");
+            LOG.error("Amenity/roomtype list get exception", throwables);
         }
 
         request.setAttribute("roomtypes", roomTypeList);

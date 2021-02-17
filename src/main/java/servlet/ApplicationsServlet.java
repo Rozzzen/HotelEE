@@ -44,7 +44,7 @@ public class ApplicationsServlet extends HttpServlet {
                 LOG.debug("Enter payment confirmation page");
                 request.getRequestDispatcher("/WEB-INF/view/room_confirmation.jsp").forward(request, response);
             } catch (SQLException e) {
-                LOG.error("Room by application id exception");
+                LOG.error("Room by application id exception", e);
             }
         }
     }
@@ -69,7 +69,7 @@ public class ApplicationsServlet extends HttpServlet {
                         roomDaoImpl.createPaymentEvent(applicationId, eventName);
                         LOG.debug("Created payment event");
                     } catch (SQLException ex) {
-                        LOG.error("Room confirmation exception");
+                        LOG.error("Room confirmation exception", ex);
                     }
                     break;
                 case "Reject":
@@ -77,7 +77,7 @@ public class ApplicationsServlet extends HttpServlet {
                         roomDaoImpl.rejectApplicationRoom(applicationId);
                         LOG.debug("Rejected application[" + applicationId + "]");
                     } catch (SQLException ex) {
-                        LOG.error("Room rejection exception");
+                        LOG.error("Room rejection exception", ex);
                     }
                     break;
                 case "Payment":
@@ -85,7 +85,7 @@ public class ApplicationsServlet extends HttpServlet {
                         roomDaoImpl.confirmPayment(applicationId);
                         LOG.debug("Confirmed payment on application[" + applicationId + "]");
                     } catch (SQLException ex) {
-                        LOG.error("Payment confirment exception");
+                        LOG.error("Payment confirment exception", ex);
                     }
                     break;
             }
@@ -100,7 +100,7 @@ public class ApplicationsServlet extends HttpServlet {
                 LOG.debug("Enter application page");
                 request.getRequestDispatcher("/WEB-INF/view/applications.jsp").forward(request, response);
             } catch (SQLException e) {
-                LOG.error("Failed to get room list exception");
+                LOG.error("Failed to get room list exception", e);
             }
         }
     }

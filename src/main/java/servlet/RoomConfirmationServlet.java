@@ -39,7 +39,7 @@ public class RoomConfirmationServlet extends HttpServlet {
                 LOG.debug("Enter room confirmation page");
                 request.getRequestDispatcher("/WEB-INF/view/room_confirmation.jsp").forward(request, response);
             } catch (SQLException e) {
-                LOG.error("Room confirmation exception");
+                LOG.error("Room confirmation exception", e);
             }
         }
         else {
@@ -54,7 +54,7 @@ public class RoomConfirmationServlet extends HttpServlet {
                     request.getSession().setAttribute("success", "Room successfully booked");
                 }
             } catch (SQLException e) {
-                LOG.error("Room confirmation exception");
+                LOG.error("Room confirmation exception", e);
                 request.getSession().setAttribute("alert", "Failed to confirm room");
             }
             finally {

@@ -79,9 +79,18 @@
                 <div class="form-group col-md-4">
                     <select class="form-control" id="month" required name="month">
                         <option value="" selected disabled><fmt:message key="register.month"/></option>
-                        <c:forEach items="${months}" var="month" begin="0" end="12" varStatus="loop">
-                            <option value = "${loop.index}">${month}</option>
-                        </c:forEach>
+                        <option value="0"><fmt:message key="january"/></option>
+                        <option value="1"><fmt:message key="February"/></option>
+                        <option value="2"><fmt:message key="March"/></option>
+                        <option value="3"><fmt:message key="April"/></option>
+                        <option value="4"><fmt:message key="May"/></option>
+                        <option value="5"><fmt:message key="June"/></option>
+                        <option value="6"><fmt:message key="July"/></option>
+                        <option value="7"><fmt:message key="August"/></option>
+                        <option value="8"><fmt:message key="September"/></option>
+                        <option value="9"><fmt:message key="October"/></option>
+                        <option value="10"><fmt:message key="November"/></option>
+                        <option value="11"><fmt:message key="December"/></option>
                     </select>
                 </div>
                 <div class="form-group col-md-4">

@@ -31,7 +31,7 @@ public class UserApplicationsServlet extends HttpServlet {
                 LOG.debug("Enter application page as admin");
                 request.getRequestDispatcher("/WEB-INF/view/applications.jsp").forward(request, response);
             } catch (SQLException ex) {
-                LOG.error("Failed to get room list exception");
+                LOG.error("Failed to get room list exception", ex);
             }
         } else {
             switch (request.getParameter("message")) {
@@ -41,7 +41,7 @@ public class UserApplicationsServlet extends HttpServlet {
                         roomDaoImpl.deleteApplication(applicationId);
                         LOG.debug("Deleted application[" + applicationId + "] as admin");
                     } catch (SQLException e) {
-                        LOG.error("Application deletion exception");
+                        LOG.error("Application deletion exception", e);
                     } finally {
                         response.sendRedirect("/admin/applications");
                     }
@@ -54,7 +54,7 @@ public class UserApplicationsServlet extends HttpServlet {
                         roomDaoImpl.insertApplicationRoom(roomNumber, applicationId);
                         LOG.debug("Chosen room [" + roomNumber + "] for user as admin");
                     } catch (SQLException e) {
-                        LOG.error("Application room selection exception");
+                        LOG.error("Application room selection exception", e);
                     } finally {
                         response.sendRedirect("/admin/applications");
                     }
@@ -67,7 +67,7 @@ public class UserApplicationsServlet extends HttpServlet {
                         LOG.debug("Enter room selection page as admin");
                         request.getRequestDispatcher("/WEB-INF/view/rooms.jsp").forward(request, response);
                     } catch (SQLException ex) {
-                        LOG.error("Failed to get room list exception");
+                        LOG.error("Failed to get room list exception", ex);
                     }
                     break;
             }
