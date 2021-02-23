@@ -19,7 +19,7 @@ public interface RoomDao {
     List<Amenity> getAmenityListPagination(int offset, int limit, String language) throws SQLException;
     List<RoomType> getRoomTypeList(String language) throws SQLException;
     List<Integer> getCapacityList() throws SQLException;
-    void insertUserApplication(int roomtypeID, int userID, int capacity, LocalDate checkin, LocalDate checkout) throws SQLException;
+    int insertUserApplication(int roomtypeID, int userID, int capacity, LocalDate checkin, LocalDate checkout) throws SQLException;
     List<UserApplication> getUserApplicationsList(int offset, int limit, int userId, String language) throws SQLException;
     void insertApplicationRoom(int roomNumber, int applicationId) throws SQLException;
     void deleteApplication(int applicationId) throws SQLException;
@@ -39,6 +39,10 @@ public interface RoomDao {
     void updateAmenitity(int id, String name, String language) throws SQLException;
     void deleteAmenity(int amenityId) throws SQLException;
     void createRoom(int roomNum, int subtypeId, int windowViewID) throws SQLException;
-    void createAmenity(String nameEN, String nameRU, String nameUA) throws SQLException;
-    void createSubType(int price, int capacity, String img, int roomtypeId, String nameEN, String nameRU, String nameUA, List<Integer> amenityList) throws SQLException;
+    int createAmenity(String nameEN, String nameRU, String nameUA) throws SQLException;
+    int createSubType(int price, int capacity, String img, int roomtypeId, String nameEN, String nameRU, String nameUA, List<Integer> amenityList) throws SQLException;
+    void deleteAllAmenities() throws SQLException;
+    void deleteAllSubtypes() throws SQLException;
+    void deleteAllApplications() throws SQLException;
+    void deleteAllRooms() throws SQLException;
 }

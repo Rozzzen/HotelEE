@@ -1,6 +1,5 @@
 import dao.Impl.RoomDaoImpl;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,9 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -42,12 +39,21 @@ public class PaginationTest {
 
     @Test
     public void RoomPaginationTest() throws SQLException {
+
         when(httpServletRequest.getParameter("checkin")).thenReturn("2021-02-10");
         when(httpServletRequest.getParameter("checkin")).thenReturn("2021-02-20");
         when(httpServletRequest.getParameter("sortBy")).thenReturn("CapacityLH");
 
         List<Room> actual = new ArrayList<>();
-        List<Room> expected = roomDao.getRoomsListDefault(0, 6, LocalDate.parse("2021-02-04"), LocalDate.parse("2021-02-20"), 3, "en");
+        List<Integer> expected = Arrays.asList(101, 102, 103, 104, 105, 106);
+
+        for (Integer integer : expected) {
+            roomDao.createRoom(
+                    integer,
+                    roomDao.createSubType(100, 2, "test", 5, "test", "test", "test", Collections.emptyList()),
+                    5
+            );
+        }
 
         Mockito.doAnswer((Answer<Void>) invocation -> {
             List<Room> tempList = (List<Room>) invocation.getArgument(1, Object.class);
@@ -56,9 +62,11 @@ public class PaginationTest {
         }).when(httpServletRequest).setAttribute(eq("rooms"), Mockito.any());
 
         sortingPagination.updateRoomRequest(httpServletRequest, roomDao);
+        roomDao.deleteAllRooms();
+        roomDao.deleteAllSubtypes();
 
         for (int i = 0; i < 6; i++) {
-            Assert.assertEquals(expected.get(i).getNumber(), actual.get(i).getNumber());
+            Assert.assertEquals(Optional.of(actual.get(i).getNumber()).get(), expected.get(i));
         }
     }
 
@@ -66,7 +74,14 @@ public class PaginationTest {
     public void ApplicationPaginationTest() throws SQLException {
 
         List<UserApplication> actual = new ArrayList<>();
-        List<UserApplication> expected = roomDao.getUserApplicationsList(0, 6, 0, "en");
+        List<Integer> expected = Arrays.asList(
+                roomDao.insertUserApplication(4, 61, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 61, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 61, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 61, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 62, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 62, 2, LocalDate.now(), LocalDate.now())
+        );
 
         Mockito.doAnswer((Answer<Void>) invocation -> {
             List<UserApplication> tempList = (List<UserApplication>) invocation.getArgument(1, Object.class);
@@ -75,19 +90,26 @@ public class PaginationTest {
         }).when(httpServletRequest).setAttribute(eq("applications"), Mockito.any());
 
         sortingPagination.updateApplicationRequest(httpServletRequest, roomDao);
+        roomDao.deleteAllApplications();
 
         Iterator<UserApplication> iterator1 = actual.iterator();
-        Iterator<UserApplication> iterator2 = expected.iterator();
+        Iterator<Integer> iterator2 = expected.iterator();
         while (iterator1.hasNext() && iterator2.hasNext()) {
-            Assert.assertEquals(iterator1.next().getId(), iterator2.next().getId());
+            Assert.assertEquals(Optional.of(iterator1.next().getId()).get(), iterator2.next());
         }
     }
 
     @Test
     public void UserApplicationPaginationTest() throws SQLException {
-
         List<UserApplication> actual = new ArrayList<>();
-        List<UserApplication> expected = roomDao.getUserApplicationsList(0, 6, 2, "en");
+        List<Integer> expected = Arrays.asList(
+                roomDao.insertUserApplication(4, 61, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 61, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 61, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 61, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 62, 2, LocalDate.now(), LocalDate.now()),
+                roomDao.insertUserApplication(4, 62, 2, LocalDate.now(), LocalDate.now())
+        );
 
         Mockito.doAnswer((Answer<Void>) invocation -> {
             List<UserApplication> tempList = (List<UserApplication>) invocation.getArgument(1, Object.class);
@@ -95,20 +117,27 @@ public class PaginationTest {
             return null;
         }).when(httpServletRequest).setAttribute(eq("applications"), Mockito.any());
 
-        sortingPagination.updateUserApplicationsRequest(httpServletRequest, roomDao, 2);
+        sortingPagination.updateUserApplicationsRequest(httpServletRequest, roomDao, 61);
+        roomDao.deleteAllApplications();
 
         Iterator<UserApplication> iterator1 = actual.iterator();
-        Iterator<UserApplication> iterator2 = expected.iterator();
+        Iterator<Integer> iterator2 = expected.iterator();
         while (iterator1.hasNext() && iterator2.hasNext()) {
-            Assert.assertEquals(iterator1.next().getId(), iterator2.next().getId());
+            Assert.assertEquals(Optional.of(iterator1.next().getId()).get(), iterator2.next());
         }
     }
 
     @Test
     public void SubTypePaginationTest() throws SQLException {
-
         List<RoomType> actual = new ArrayList<>();
-        List<RoomType> expected = roomDao.getSubtypeList(0, 6, "en");
+        List<Integer> expected = Arrays.asList(
+                roomDao.createSubType(100, 2, "test", 5, "test", "test", "test", Collections.emptyList()),
+                roomDao.createSubType(100, 2, "test", 5, "test", "test", "test", Collections.emptyList()),
+                roomDao.createSubType(100, 2, "test", 5, "test", "test", "test", Collections.emptyList()),
+                roomDao.createSubType(100, 2, "test", 5, "test", "test", "test", Collections.emptyList()),
+                roomDao.createSubType(100, 2, "test", 5, "test", "test", "test", Collections.emptyList()),
+                roomDao.createSubType(100, 2, "test", 5, "test", "test", "test", Collections.emptyList())
+        );
 
         Mockito.doAnswer((Answer<Void>) invocation -> {
             List<RoomType> tempList = (List<RoomType>) invocation.getArgument(1, Object.class);
@@ -117,18 +146,28 @@ public class PaginationTest {
         }).when(httpServletRequest).setAttribute(eq("subtypes"), Mockito.any());
 
         sortingPagination.updateRoomTypeRequest(httpServletRequest, roomDao);
+        roomDao.deleteAllSubtypes();
 
         Iterator<RoomType> iterator1 = actual.iterator();
-        Iterator<RoomType> iterator2 = expected.iterator();
+        Iterator<Integer> iterator2 = expected.iterator();
         while (iterator1.hasNext() && iterator2.hasNext()) {
-            Assert.assertEquals(iterator1.next().getId(), iterator2.next().getId());
+            Assert.assertEquals(Optional.of(iterator1.next().getId()).get(), iterator2.next());
         }
     }
 
     @Test
     public void AmenityPaginationTest() throws SQLException {
+
+        List<Integer> expected = Arrays.asList(
+                roomDao.createAmenity("test", "test", "test"),
+                roomDao.createAmenity("test", "test", "test"),
+                roomDao.createAmenity("test", "test", "test"),
+                roomDao.createAmenity("test", "test", "test"),
+                roomDao.createAmenity("test", "test", "test"),
+                roomDao.createAmenity("test", "test", "test")
+        );
+
         List<Amenity> actual = new ArrayList<>();
-        List<Amenity> expected = roomDao.getAmenityListPagination(0, 6, "en");
 
         Mockito.doAnswer((Answer<Void>) invocation -> {
             List<Amenity> tempList = (List<Amenity>) invocation.getArgument(1, Object.class);
@@ -136,12 +175,13 @@ public class PaginationTest {
             return null;
         }).when(httpServletRequest).setAttribute(eq("amenities"), Mockito.any());
 
-        sortingPagination.updateRoomTypeRequest(httpServletRequest, roomDao);
+        sortingPagination.updateAmenityRequest(httpServletRequest, roomDao);
+        roomDao.deleteAllAmenities();
 
         Iterator<Amenity> iterator1 = actual.iterator();
-        Iterator<Amenity> iterator2 = expected.iterator();
+        Iterator<Integer> iterator2 = expected.iterator();
         while (iterator1.hasNext() && iterator2.hasNext()) {
-            Assert.assertEquals(iterator1.next().getId(), iterator2.next().getId());
+            Assert.assertEquals(Optional.of(iterator1.next().getId()).get(), iterator2.next());
         }
     }
 }

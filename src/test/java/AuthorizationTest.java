@@ -29,14 +29,14 @@ public class AuthorizationTest {
         gender.setId(1);
         User expectedUser = new User();
         expectedUser.setRole(UserRole.ADMIN);
-        expectedUser.setId(4);
+        expectedUser.setId(62);
         expectedUser.setGender(gender);
-        expectedUser.setName("Admin");
-        expectedUser.setSurname("1");
-        expectedUser.setEmail("admin1@gmail.com");
-        expectedUser.setPhone("+380 44 942 12 40");
-        expectedUser.setPassword("admin");
-        expectedUser.setBdate(LocalDate.parse("1998-02-11"));
+        expectedUser.setName("test2");
+        expectedUser.setSurname("test2");
+        expectedUser.setEmail("test2@gmail.com");
+        expectedUser.setPhone("test2");
+        expectedUser.setPassword("test2");
+        expectedUser.setBdate(LocalDate.parse("2021-02-17"));
 
         LoginServlet loginServlet = new LoginServlet();
         HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
@@ -50,9 +50,9 @@ public class AuthorizationTest {
             return null;
         }).when(httpSession).setAttribute(anyString(), Mockito.any());
 
-        when(httpServletRequest.getParameter("email")).thenReturn("admin1@gmail.com");
+        when(httpServletRequest.getParameter("email")).thenReturn("test2@gmail.com");
         when(httpServletRequest.getSession()).thenReturn(httpSession);
-        when(httpServletRequest.getParameter("password")).thenReturn("admin");
+        when(httpServletRequest.getParameter("password")).thenReturn("test2");
 
         loginServlet.doPost(httpServletRequest, httpServletResponse);
 

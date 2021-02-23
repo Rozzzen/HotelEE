@@ -114,10 +114,10 @@ public class RoomDaoImpl implements RoomDao {
             "         LEFT JOIN room_subtypes rs ON r.roomtype_id = rs.id\n" +
             "ORDER BY ua.id\n" +
             "LIMIT ? OFFSET ?";
-    private final String INSERT_APPLICATION_ROOM = "UPDATE hotel.user_applications t SET t.response_room_number = ? WHERE t.id = ?";
+    private final String INSERT_APPLICATION_ROOM = "UPDATE user_applications t SET t.response_room_number = ? WHERE t.id = ?";
     private final String DELETE_APPLICATION = "DELETE FROM user_applications ua WHERE ua.id = ?;";
-    private final String CONFIRM_APPLICATION = "UPDATE hotel.user_applications t SET t.is_booked = 1 WHERE t.id = ?";
-    private final String REJECT_APPLICATION = "UPDATE hotel.user_applications t SET t.response_room_number = null WHERE t.id = ?";
+    private final String CONFIRM_APPLICATION = "UPDATE user_applications t SET t.is_booked = 1 WHERE t.id = ?";
+    private final String REJECT_APPLICATION = "UPDATE user_applications t SET t.response_room_number = null WHERE t.id = ?";
     private final String SELECT_APPLICATION_BY_ID = "SELECT ua.response_room_number, ua.user_id, ua.checkin, ua.checkout FROM user_applications ua WHERE ua.id = ?";
     private final String SELECT_ROOM_BY_APPLICATION_ID = "SELECT r.price, r.img_path, rt.roomtype_name, r2.room_number\n" +
             "FROM user_applications\n" +
@@ -135,12 +135,12 @@ public class RoomDaoImpl implements RoomDao {
             "            ua.checkout = rb.unavailable_until_date AND ua.response_room_number = rb.room_id\n" +
             "    WHERE ua.is_paid = 0\n" +
             "      AND ua.id = ?;";
-    private final String CONFIRM_PAYMENT = "UPDATE hotel.user_applications t SET t.is_paid = 1 WHERE t.id = ?";
+    private final String CONFIRM_PAYMENT = "UPDATE user_applications t SET t.is_paid = 1 WHERE t.id = ?";
     private final String SELECT_SUBTYPE_NAMES = "SELECT rst.subtype_name, rs.id FROM room_subtypes AS rs\n" +
             "                JOIN room_subtype_translations rst on rs.id = rst.roomtype_id AND rst.language = ?";
     private final String SELECT_WINDOW_VIEW_NAMES = "SELECT wvt.window_view_name, wv.id FROM window_views wv\n" +
             "            join window_view_translations wvt on wv.id = wvt.window_view_id AND wvt.language = ?";
-    private final String UPDATE_ROOM = "UPDATE hotel.rooms t SET t.roomtype_id = ?, t.window_view_id = ? WHERE t.room_number = ?";
+    private final String UPDATE_ROOM = "UPDATE rooms t SET t.roomtype_id = ?, t.window_view_id = ? WHERE t.room_number = ?";
     private final String DELETE_ROOM = "delete from rooms r where r.room_number = ?";
     private final String DELETE_SUBTYPE = "DELETE rs FROM room_subtypes rs WHERE id = ?;";
     private final String DELETE_AMENITY = "DELETE a FROM amenities a WHERE a.id = ?;";
@@ -152,7 +152,7 @@ public class RoomDaoImpl implements RoomDao {
             "         JOIN amenity_translations at on a.id = at.amenity_id AND at.language = ?\n" +
             "LIMIT ? OFFSET ?;";
 
-    private final String UPDATE_SUBTYPE = "UPDATE hotel.room_subtypes t\n" +
+    private final String UPDATE_SUBTYPE = "UPDATE room_subtypes t\n" +
             "    JOIN room_subtype_translations rst on t.id = rst.roomtype_id AND rst.language = ?\n" +
             "SET t.price          = ?,\n" +
             "    t.capacity       = ?,\n" +
@@ -168,10 +168,10 @@ public class RoomDaoImpl implements RoomDao {
             "JOIN room_subtypes rs on ra.roomtype_id = rs.id\n" +
             "WHERE rs.id = ?;";
     private final String INSERT_AMENITIES = "INSERT INTO roomtype_amenity(amenity_id, roomtype_id) VALUE(?,?);";
-    private final String CREATE_ROOM = "INSERT INTO hotel.rooms (room_number, roomtype_id, window_view_id) VALUES (?, ?, ?)";
-    private final String CREATE_AMENITY = "INSERT INTO hotel.amenities VALUES ()";
+    private final String CREATE_ROOM = "INSERT INTO rooms (room_number, roomtype_id, window_view_id) VALUES (?, ?, ?)";
+    private final String CREATE_AMENITY = "INSERT INTO amenities VALUES ()";
     private final String CREATE_AMENITY_TRANSLATIONS = "INSERT INTO amenity_translations(amenity_id, language, amenity_name) VALUES (?,?,?);";
-    private final String CREATE_SUBTYPE = "INSERT INTO hotel.room_subtypes (price, capacity, img_path, roomtype_id) VALUES (?, ?, ?, ?)";
+    private final String CREATE_SUBTYPE = "INSERT INTO room_subtypes (price, capacity, img_path, roomtype_id) VALUES (?, ?, ?, ?)";
     private final String CREATE_SUBTYPE_TRANSLATION = "INSERT INTO room_subtype_translations(roomtype_id, language, subtype_name) VALUES (?,?,?);";
 
     @Override
@@ -422,8 +422,8 @@ public class RoomDaoImpl implements RoomDao {
     }
 
     @Override
-    public void insertUserApplication(int roomtypeID, int userID, int capacity, LocalDate checkin, LocalDate checkout) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER_APPLICATION);
+    public int insertUserApplication(int roomtypeID, int userID, int capacity, LocalDate checkin, LocalDate checkout) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER_APPLICATION, Statement.RETURN_GENERATED_KEYS);
         preparedStatement.setInt(1, userID);
         preparedStatement.setInt(2, roomtypeID);
         preparedStatement.setInt(3, capacity);
@@ -431,6 +431,11 @@ public class RoomDaoImpl implements RoomDao {
         preparedStatement.setObject(5, checkout);
         preparedStatement.executeUpdate();
 
+        int applicationId = 0;
+        ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+        if (generatedKeys.next()) applicationId = generatedKeys.getInt(1);
+
+        return applicationId;
     }
 
     @Override
@@ -755,7 +760,7 @@ public class RoomDaoImpl implements RoomDao {
     }
 
     @Override
-    public void createAmenity(String nameEN, String nameRU, String nameUA) throws SQLException {
+    public int createAmenity(String nameEN, String nameRU, String nameUA) throws SQLException {
 
         PreparedStatement amenityStatement = connection.prepareStatement(CREATE_AMENITY, Statement.RETURN_GENERATED_KEYS);
         PreparedStatement translationStatement = connection.prepareStatement(CREATE_AMENITY_TRANSLATIONS);
@@ -782,10 +787,12 @@ public class RoomDaoImpl implements RoomDao {
         translationStatement.addBatch();
 
         translationStatement.executeBatch();
+
+        return amenityId;
     }
 
     @Override
-    public void createSubType(int price, int capacity, String img, int roomtypeId, String nameEN, String nameRU, String nameUA, List<Integer> amenityList) throws SQLException {
+    public int createSubType(int price, int capacity, String img, int roomtypeId, String nameEN, String nameRU, String nameUA, List<Integer> amenityList) throws SQLException {
 
         PreparedStatement subtypeStatement = connection.prepareStatement(CREATE_SUBTYPE, Statement.RETURN_GENERATED_KEYS);
         PreparedStatement translationStatement = connection.prepareStatement(CREATE_SUBTYPE_TRANSLATION);
@@ -824,5 +831,35 @@ public class RoomDaoImpl implements RoomDao {
             amenityInsertionStatement.addBatch();
         }
         amenityInsertionStatement.executeBatch();
+
+        return subtypeId;
+    }
+
+    @Override
+    public void deleteAllAmenities() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM hoteltest.amenities;");
+        PreparedStatement preparedStatementTwo = connection.prepareStatement("DELETE FROM hoteltest.amenity_translations;");
+        preparedStatement.executeUpdate();
+        preparedStatementTwo.executeUpdate();
+    }
+
+    @Override
+    public void deleteAllSubtypes() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM hoteltest.room_subtypes;");
+        PreparedStatement preparedStatementTwo = connection.prepareStatement("DELETE FROM hoteltest.room_subtype_translations;");
+        preparedStatement.executeUpdate();
+        preparedStatementTwo.executeUpdate();
+    }
+
+    @Override
+    public void deleteAllApplications() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM hoteltest.user_applications;");
+        preparedStatement.executeUpdate();
+    }
+
+    @Override
+    public void deleteAllRooms() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM hoteltest.rooms;");
+        preparedStatement.executeUpdate();
     }
 }
